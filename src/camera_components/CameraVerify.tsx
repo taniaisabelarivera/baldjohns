@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useScroll, useTransform, motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import VerifyButton from '../../components/VerifyButton';
@@ -48,6 +48,20 @@ export default function DivePage() {
   const lockedIndex = trashItems.findIndex(item => !verifiedIds.includes(item.id));
   const dynamicHeight = nextLockedItem ? (lockedIndex + 1) * 1200 + 1000 : 15000; 
 
+  // --- MEMOIZED BUBBLES ---
+  // Using absolute positioning so they move WITH the scroll, not against it.
+  const bubbles = useMemo(() => {
+    return Array.from({ length: 40 }).map((_, i) => ({
+      id: i,
+      size: Math.random() * 15 + 5,
+      left: Math.random() * 100,
+      top: Math.random() * 100, // Percentage of the total height
+      duration: Math.random() * 20 + 10,
+      delay: Math.random() * -20, // Start mid-animation
+      depth: Math.random() * 4, // For blur depth
+    }));
+  }, []);
+
   const handleVerify = (id) => {
     setVerifiedIds(prev => [...prev, id]); 
     setScore(prev => prev + 100);
@@ -61,21 +75,31 @@ export default function DivePage() {
       {/* SCENIC RAYS */}
       <motion.div style={{ position: 'fixed', top: 0, left: 0, right: 0, height: '600px', background: 'linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.1) 40%, transparent 60%)', filter: 'blur(50px)', opacity: rayOpacity, zIndex: 1, pointerEvents: 'none' }} />
 
-      {/* BUBBLES */}
-      {Array.from({ length: 25 }).map((_, i) => (
+      {/* --- REFINED BUBBLES --- */}
+      {bubbles.map((b) => (
         <motion.div
-          key={i}
-          initial={{ y: '110vh', x: `${Math.random() * 100}vw`, opacity: 0 }}
-          animate={{ y: '-20vh', opacity: [0, 0.5, 0.5, 0], x: [`${Math.random() * 100}vw`, `${Math.random() * 100 + (Math.random() * 50 - 25)}vw`] }}
-          transition={{ duration: Math.random() * 12 + 8, repeat: Infinity, delay: Math.random() * 10, ease: "linear" }}
+          key={b.id}
+          initial={{ y: `${b.top + 20}%`, opacity: 0 }}
+          animate={{ 
+            y: [`${b.top + 20}%`, `${b.top - 20}%`], 
+            x: [0, 15, -15, 0], // Subtle side-to-side "wobble"
+            opacity: [0, 0.4, 0.4, 0] 
+          }}
+          transition={{ 
+            y: { duration: b.duration, repeat: Infinity, ease: "linear", delay: b.delay },
+            x: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+            opacity: { duration: b.duration, repeat: Infinity, ease: "linear", delay: b.delay }
+          }}
           style={{ 
-            position: 'fixed', 
-            width: `${Math.random() * 14 + 6}px`, 
-            height: `${Math.random() * 14 + 6}px`, 
+            position: 'absolute', // Absolute makes them move with the water
+            left: `${b.left}%`,
+            width: `${b.size}px`, 
+            height: `${b.size}px`, 
             borderRadius: '50%', 
-            background: 'radial-gradient(circle at 35% 35%, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.1) 60%, rgba(255,255,255,0) 100%)',
-            boxShadow: 'inset -2px -2px 6px rgba(0,0,0,0.2), 0 0 10px rgba(255,255,255,0.2)',
-            border: '0.5px solid rgba(255,255,255,0.3)',
+            background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.05) 70%)',
+            border: '0.5px solid rgba(255,255,255,0.2)',
+            boxShadow: '0 0 5px rgba(255,255,255,0.1)',
+            filter: `blur(${b.depth}px)`,
             zIndex: 2, 
             pointerEvents: 'none' 
           }}
@@ -103,29 +127,23 @@ export default function DivePage() {
         const isCurrentTarget = nextLockedItem && nextLockedItem.id === item.id;
         if (!isVerified && !isCurrentTarget && index > lockedIndex) return null;
 
-        // --- THE FIX ---
         const moveRightToLeft = index % 2 === 0; 
         const leftPoint = '-25vw';
         const rightPoint = '125vw';
         const xMovement = moveRightToLeft ? [rightPoint, leftPoint] : [leftPoint, rightPoint];
-
-        // Based on the screenshot, your turtle naturally faces LEFT.
         const isTurtle = item.animal_name.toLowerCase().includes('turtle'); 
 
         let finalTransform = 'none';
         if (isSwimmer(item.animal_name)) {
           if (isTurtle) {
-             // If moving right (moveRightToLeft is false), it needs to be flipped!
              finalTransform = moveRightToLeft ? 'scaleX(1)' : 'scaleX(-1)';
           } else {
-             // For other fish that usually face right naturally:
              finalTransform = moveRightToLeft ? 'scaleX(-1)' : 'scaleX(1)';
           }
         }
 
         return (
           <div key={item.id}>
-            {/* TRASH CARD */}
             <motion.div style={{ 
               position: 'absolute', top: `${(index + 1) * 1200}px`, left: '50%', transform: 'translateX(-50%)', 
               border: `1px solid ${isVerified ? '#00ffaa' : '#00d4ff'}`, padding: isMobile ? '12px' : '25px', 
@@ -135,12 +153,11 @@ export default function DivePage() {
               <h3 style={{ color: isVerified ? '#00ffaa' : '#fff', textAlign: 'center', margin: '0 0 10px 0' }}>
                 {isVerified ? `[CLEARED]` : ''} {item.item_name}
               </h3>
-              <img src={item.image_url} style={{ width: '100%', height: isMobile ? '120px' : '200px', objectFit: 'contain' }} />
+              <img src={item.image_url} alt={item.item_name} style={{ width: '100%', height: isMobile ? '120px' : '200px', objectFit: 'contain' }} />
               <p style={{ color: '#bde0fe', fontSize: '0.85rem', borderTop: '1px solid rgba(0,212,255,0.1)', paddingTop: '10px' }}>{item.impact_fact}</p>
               {isCurrentTarget && <VerifyButton itemId={item.id} onVerifySuccess={handleVerify} />}
             </motion.div>
 
-            {/* ANIMALS */}
             <AnimatePresence>
               {isVerified && (
                 <motion.div
@@ -162,7 +179,7 @@ export default function DivePage() {
                     transform: finalTransform 
                   }}
                 >
-                  <img src={item.animal_image_url} style={{ width: '100%', filter: 'none' }} />
+                  <img src={item.animal_image_url} alt={item.animal_name} style={{ width: '100%', filter: 'none' }} />
                   <p style={{ color: '#00ffaa', fontSize: '0.8rem', textAlign: 'center', marginTop: '12px' }}>{item.animal_name}</p>
                 </motion.div>
               )}
