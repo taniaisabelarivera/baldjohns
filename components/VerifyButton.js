@@ -12,19 +12,24 @@ export default function VerifyButton({ itemId, onVerifySuccess }) {
     setIsUploading(true);
     
     try {
-      // In the future, you can point this to your Human Delta API logic
-      const response = await fetch(`/api/upload?filename=${file.name}`, {
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('targetId', itemId);
+
+      const response = await fetch('/api/verify', {
         method: 'POST',
-        body: file,
+        body: formData,
       });
 
-      if (response.ok) {
+      const result = await response.json();
+
+      if (result.verified) {
         onVerifySuccess(itemId);
       } else {
-        alert("Scan failed. Check sonar signal!");
+        alert("SCAN REJECTED: Object does not match known pollutant.");
       }
     } catch (error) {
-      console.error("Verification Error:", error);
+      alert("COMMS ERROR: Check sonar/network.");
     } finally {
       setIsUploading(false);
     }
@@ -32,31 +37,17 @@ export default function VerifyButton({ itemId, onVerifySuccess }) {
 
   return (
     <div style={{ width: '100%', marginTop: '10px' }}>
-      <input 
-        type="file" 
-        accept="image/*" 
-        capture="environment" 
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        style={{ display: 'none' }}
-      />
-      
+      <input type="file" accept="image/*" capture="environment" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
       <button 
         onClick={() => fileInputRef.current.click()}
         disabled={isUploading}
         style={{ 
-          width: '100%', 
-          padding: '12px', 
-          backgroundColor: isUploading ? '#1a1a1a' : '#00d4ff', 
-          color: isUploading ? '#00d4ff' : '#000', 
-          fontWeight: 'bold', 
-          border: isUploading ? '1px solid #00d4ff' : 'none', 
-          cursor: isUploading ? 'not-allowed' : 'pointer',
-          borderRadius: '4px',
-          fontSize: '0.9rem'
+          width: '100%', padding: '12px', borderRadius: '8px',
+          backgroundColor: isUploading ? '#111' : '#00ffaa', 
+          color: '#000', fontWeight: 'bold', border: 'none'
         }}
       >
-        {isUploading ? 'SCANNING...' : '📷 TAKE SCAN'}
+        {isUploading ? 'AI ANALYZING...' : '📷 SCAN TO VERIFY'}
       </button>
     </div>
   );
