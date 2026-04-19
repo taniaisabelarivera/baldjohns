@@ -13,6 +13,7 @@
     "@vercel/postgres": "^0.10.0",
     "framer-motion": "^12.38.0",
     "next": "latest",
+    "pg": "^8.20.0",
     "react": "latest",
     "react-dom": "latest"
   },
