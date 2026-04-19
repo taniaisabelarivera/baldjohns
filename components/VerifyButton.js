@@ -12,6 +12,7 @@ export default function VerifyButton({ itemId, onVerifySuccess }) {
     setIsUploading(true);
     
     try {
+      // In the future, you can point this to your Human Delta API logic
       const response = await fetch(`/api/upload?filename=${file.name}`, {
         method: 'POST',
         body: file,
@@ -30,8 +31,7 @@ export default function VerifyButton({ itemId, onVerifySuccess }) {
   };
 
   return (
-    <div style={{ width: '100%', marginTop: '15px' }}>
-      {/* 'capture' tells mobile browsers to open the camera instead of the gallery */}
+    <div style={{ width: '100%', marginTop: '10px' }}>
       <input 
         type="file" 
         accept="image/*" 
@@ -46,16 +46,17 @@ export default function VerifyButton({ itemId, onVerifySuccess }) {
         disabled={isUploading}
         style={{ 
           width: '100%', 
-          padding: '15px', 
+          padding: '12px', 
           backgroundColor: isUploading ? '#1a1a1a' : '#00d4ff', 
           color: isUploading ? '#00d4ff' : '#000', 
           fontWeight: 'bold', 
           border: isUploading ? '1px solid #00d4ff' : 'none', 
           cursor: isUploading ? 'not-allowed' : 'pointer',
-          borderRadius: '4px'
+          borderRadius: '4px',
+          fontSize: '0.9rem'
         }}
       >
-        {isUploading ? 'SCANNING ENVIRO...' : '📷 TAKE SCAN TO VERIFY'}
+        {isUploading ? 'SCANNING...' : '📷 TAKE SCAN'}
       </button>
     </div>
   );
