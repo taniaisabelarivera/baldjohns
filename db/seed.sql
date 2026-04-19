@@ -1,3 +1,6 @@
+-- DEEP SEA HACKATHON SEED DATA
+-- Last Updated: April 19, 2026
+
 INSERT INTO trash_catalog (id, zone_name, item_name, impact_fact, required_unlock_depth, image_url) VALUES
 -- Sunlight Zone (0–200m)
 (1,  'Sunlight', 'Single-Use Plastic Bag',             'Sea turtles mistake plastic bags for jellyfish, causing fatal intestinal blockages.',                                                                          15,   'https://xragmlmrgzsgbq5z.public.blob.vercel-storage.com/plastic-bag.png'),
@@ -23,3 +26,43 @@ INSERT INTO trash_catalog (id, zone_name, item_name, impact_fact, required_unloc
 
 -- Hadal Zone (6,000–11,000m)
 (15, 'Hadal',    'Polyethylene Microplastic Pellet',   'Microplastics have been found in the guts of amphipods at 10,890m depth in the Mariana Trench, the deepest confirmed plastic contamination on Earth.',       9200, 'https://xragmlmrgzsgbq5z.public.blob.vercel-storage.com/microplastics.png');
+
+
+INSERT INTO marine_life (trash_id, common_name, scientific_name, zone_name, how_affected, image_url) VALUES
+-- Sunlight Zone
+-- (1) Single-Use Plastic Bag → Loggerhead Sea Turtle
+(1,  'Loggerhead Sea Turtle',      'Caretta caretta',              'Sunlight', 'Mistakes floating plastic bags for jellyfish prey; ingestion causes fatal intestinal blockages and internal gas buildup.',                                'https://xragmlmrgzsgbq5z.public.blob.vercel-storage.com/loggerhead-turtle.png'),
+-- (2) Aluminium Soda Can → Staghorn Coral
+(2,  'Staghorn Coral',             'Acropora cervicornis',         'Sunlight', 'Aluminium oxide leached from corroding cans raises local pH toxicity, bleaching coral polyps and halting calcium carbonate growth.',                     'https://xragmlmrgzsgbq5z.public.blob.vercel-storage.com/STAGHORN-CORAL.png'),
+-- (3) Disposable Cigarette Lighter → Bottlenose Dolphin
+(3,  'Bottlenose Dolphin',         'Tursiops truncatus',           'Sunlight', 'Heavy metals released from degrading lighters bioaccumulate up the food chain, impairing dolphin immune and reproductive systems.',                      'https://xragmlmrgzsgbq5z.public.blob.vercel-storage.com/dolphin_bottlenose.png'),
+-- (4) Polystyrene Foam Cup → Yellowfin Tuna (juvenile)
+(4,  'Yellowfin Tuna',             'Thunnus albacares',            'Sunlight', 'Juvenile tuna ingest polystyrene microbeads alongside zooplankton, causing gut blockages and transferring toxic styrene compounds into tissue.',          'https://xragmlmrgzsgbq5z.public.blob.vercel-storage.com/yellowfin-tuna.png'),
+
+-- Twilight Zone
+-- (6) Lost Crab Pot → Dungeness Crab
+(5,  'Dungeness Crab',             'Metacarcinus magister',        'Twilight', 'Enters ghost traps attracted by bait scent or trapped prey and cannot escape, leading to starvation and death that baits further crabs.',               'https://xragmlmrgzsgbq5z.public.blob.vercel-storage.com/crab.png'),
+-- (7) Rubber Car Tyre Fragment → Coho Salmon
+(6,  'Coho Salmon',                'Oncorhynchus kisutch',         'Twilight', '6PPD-quinone leached from tyre rubber causes acute mortality in coho salmon at concentrations as low as 0.8 micrograms per litre.',                      'https://xragmlmrgzsgbq5z.public.blob.vercel-storage.com/coho-salmon.png'),
+-- (8) Discarded Scuba Tank → Lanternfish
+(7,  'Lanternfish',                'Myctophum punctatum',          'Twilight', 'Corroding tanks alter dissolved oxygen and iron levels along vertical migration routes, disrupting the diel migration patterns lanternfish depend on.',   'https://xragmlmrgzsgbq5z.public.blob.vercel-storage.com/lanternfish.png'),
+-- (9) Plastic Shipping Strap → Sperm Whale
+(8,  'Sperm Whale',                'Physeter macrocephalus',       'Twilight', 'Rigid strapping bands encountered during deep dives cause severe mouth and flipper lacerations, and accumulate in stomachs alongside other ingested debris.', 'https://xragmlmrgzsgbq5z.public.blob.vercel-storage.com/sperm-whale.png'),
+ 
+-- Midnight Zone
+-- (10) Sunken Cargo Container → Dumbo Octopus
+(9, 'Dumbo Octopus',              'Grimpoteuthis boylei',         'Midnight', 'Containers smother soft sediment hunting grounds and chemosynthetic vent communities that dumbo octopuses rely on for shelter and prey.',                'https://xragmlmrgzsgbq5z.public.blob.vercel-storage.com/dumbo_octopus.png'),
+-- (11) Discarded Medical Waste Barrel → Sea Cucumber
+(10, 'Sea Cucumber',               'Scotoplanes globosa',          'Midnight', 'Feeds directly on abyssal sediment and accumulates pharmaceutical compounds and pathogens leached from degrading medical waste barrels.',                'https://xragmlmrgzsgbq5z.public.blob.vercel-storage.com/sea-cucumber.png'),
+-- (12) Deep-Sea Trawl Net Fragment → Roundnose Grenadier
+(11, 'Roundnose Grenadier',        'Coryphaenoides rupestris',     'Midnight', 'Slow-moving deep-water fish become entangled in lost trawl mesh with no means of escape, contributing to population declines already stressed by overfishing.', 'https://xragmlmrgzsgbq5z.public.blob.vercel-storage.com/grenadier.png'),
+ 
+-- Abyssal Zone
+-- (13) Plastic Detergent Bottle → Abyssal Sea Cucumber (Holothurian)
+(12, 'Abyssal Holothurian',        'Benthodytes sanguinolenta',    'Abyssal',  'Surfactants from detergent residue disrupt the lipid membranes of the bacteria these deposit feeders consume, removing a critical food source.',          'https://xragmlmrgzsgbq5z.public.blob.vercel-storage.com/abyssal.png'),
+-- (14) Corroded Lead Fishing Weight → Polychaete Worm
+(13, 'Polychaete Worm',            'Glycera dibranchiata',         'Abyssal',  'Deposit-feeding worms ingest lead-contaminated sediment directly, accumulating neurotoxic lead compounds that impair reproduction and larval survival.',  'https://xragmlmrgzsgbq5z.public.blob.vercel-storage.com/polychaete.png'),
+ 
+-- Hadal Zone
+-- (15) Polyethylene Microplastic Pellet → Amphipod
+(14, 'Hadal Amphipod',             'Hirondellea gigas',            'Hadal',    'Scavenging amphipods at depths exceeding 10,000m have been found with microplastic fragments in their digestive tracts, confirming the deepest known plastic contamination on Earth.', 'https://xragmlmrgzsgbq5z.public.blob.vercel-storage.com/hadal-amphipod.png');

@@ -1,5 +1,5 @@
 -- DEEP SEA HACKATHON SCHEMA
--- Last Updated: April 18, 2026
+-- Last Updated: April 19, 2026
 
 -- User profiles and their current progress
 CREATE TABLE users (
@@ -27,4 +27,15 @@ CREATE TABLE user_cleanups (
     evidence_photo_url TEXT,         -- URL from Vercel Blob
     is_verified BOOLEAN DEFAULT FALSE,
     submitted_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Marine life affected by each pollution item
+CREATE TABLE marine_life (
+    id SERIAL PRIMARY KEY,
+    trash_id INT REFERENCES trash_catalog(id),
+    common_name TEXT NOT NULL,
+    scientific_name TEXT NOT NULL,
+    zone_name TEXT NOT NULL,
+    how_affected TEXT NOT NULL,
+    image_url TEXT
 );
