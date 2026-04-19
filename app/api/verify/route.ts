@@ -1,45 +1,58 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const { image, trashId } = await req.json();
+    // 1. Parse the incoming JSON from your test_api.http
+    const body = await req.json();
+    const { image, trashId } = body;
 
-    // Safety check for your environment variable
-    if (!process.env.HUMAN_DELTA_API_KEY) {
-      return NextResponse.json({ error: "AI API Key missing on server" }, { status: 500 });
+    console.log(🔍 Guardian: Processing file upload for [${trashId}]);
+// 2. Validate API Key
+    const apiKey = process.env.HUMAN_DELTA_API_KEY;
+    if (!apiKey) {
+      console.error("❌ Key Missing in .env.local");
+      return NextResponse.json({ error: "Server Configuration Error" }, { status: 500 });
     }
 
-    const response = await fetch('https://api.humandelta.com/v1/verify', {
-      method: 'POST',
+    // 3. THE FIX: Convert Base64 string to a File Blob
+    // This removes the "data:image/png;base64," prefix if it exists
+    const base64Content = image.includes(",") ? image.split(",")[1] : image;
+    const buffer = Buffer.from(base64Content, "base64");
+    const imageBlob = new Blob([buffer], { type: "image/png" });
+
+    // 4. Create Multipart Form Data
+    const formData = new FormData();
+    formData.append("file", imageBlob, "capture.png"); // The API expects the key 'file'
+    formData.append("task", Verify photo of ${trashId});
+
+    // 5. The Fetch (Notice: No 'Content-Type' header here!)
+    const response = await fetch("https://api.humandelta.ai/v1/documents", {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${process.env.HUMAN_DELTA_API_KEY}`,
-        'Content-Type': 'application/json'
+        "Authorization": Bearer ${apiKey},
       },
-      body: JSON.stringify({
-        image_url: image, 
-        task: `Verify if this is a real photo of ${trashId}`
-      })
+      body: formData,
     });
 
-    if (!response.ok) {
+    // 6. Handle Response
+    const contentType = response.headers.get("content-type");
+
+    if (response.ok && contentType?.includes("application/json")) {
+      const data = await response.json();
+      console.log("✅ VERIFICATION COMPLETE:", data);
+      return NextResponse.json(data);
+    } else {
       const errorText = await response.text();
-      throw new Error(`AI Service Error: ${errorText}`);
+      console.error(⚠️ API REJECTION (${response.status}):, errorText.slice(0, 500));
+
+      return NextResponse.json({ 
+        error: API returned ${response.status},
+        details: errorText 
+      }, { status: response.status });
     }
 
-    const data = await response.json();
-
-    // Send a clean response back to your game frontend
-    return NextResponse.json({ 
-      success: true, 
-      verified: data.verified, // AI result
-      raw: data 
-    });
-
-  } catch (error: any) {
-    console.error('Verification Route Error:', error);
-    return NextResponse.json(
-      { success: false, error: error.message }, 
-      { status: 500 }
-    );
+  } catch (err: any) {
+    console.error("🚨 SERVER CRASH:", err.message);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
