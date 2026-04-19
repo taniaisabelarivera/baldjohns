@@ -40,14 +40,21 @@ export default function DivePage() {
 
   useEffect(() => {
     async function fetchData() {
-      try {
-        const res = await fetch('/api/trash');
-        const data = await res.json();
-        setTrashItems(data.sort((a, b) => a.required_unlock_depth - b.required_unlock_depth));
-      } catch (error) {
-        console.error("Sonar Failure:", error);
-      }
+  try {
+    const res = await fetch('/api/trash');
+    const data = await res.json();
+    
+    // Check if data is actually an array before sorting
+    if (Array.isArray(data)) {
+      setTrashItems(data.sort((a, b) => a.required_unlock_depth - b.required_unlock_depth));
+    } else {
+      console.error("API Error Response:", data);
+      // Optional: set an error state here to show the user
     }
+  } catch (error) {
+    console.error("Sonar Failure:", error);
+  }
+}
     fetchData();
   }, []);
 
