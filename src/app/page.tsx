@@ -1,5 +1,5 @@
 // Try this if @/ isn't working
-import CameraVerify from '../components/CameraVerify';
+import CameraVerify from '../camera_components/CameraVerify';
 
 export default function Home() {
   return (
